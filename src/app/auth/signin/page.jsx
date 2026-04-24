@@ -1,27 +1,30 @@
 "use client";
 import { authClient } from "@/lib/auth-client";
-import { Check } from "@gravity-ui/icons";
+import { Check, Eye, EyeSlash } from "@gravity-ui/icons";
 import {
     Button,
     Description,
     FieldError,
     Form,
     Input,
+    InputGroup,
     Label,
     TextField,
 } from "@heroui/react";
+import { useState } from "react";
 
-const SignUpPage = () => {
+const SignInPage = () => {
+    const [isVisible, setIsVisible] = useState(false);
     const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const userData = Object.fromEntries(formData.entries());
         console.log("Form submitted with:", userData);
 
-        const { data, error } = await authClient.signUp.email({
-            name: userData.name,
+        const { data, error } = await authClient.signIn.email({
             email: userData.email,
             password: userData.password,
+            rememberMe: true,
             callbackURL: "/",
         });
         console.log("sign up response:", { data, error });
@@ -29,28 +32,13 @@ const SignUpPage = () => {
     return (
         <div className="container mx-auto">
             <h2 className="text-4xl text-center my-10 underline">
-                Please Sign Up
+                Please Sign In
             </h2>
 
             <Form
                 className="flex w-1/4 mx-auto flex-col gap-4 border p-4 rounded-2xl"
                 onSubmit={onSubmit}
             >
-                <TextField
-                    isRequired
-                    name="name"
-                    type="text"
-                    validate={(value) => {
-                        if (value.length < 3) {
-                            return "Name must be at least 3 characters";
-                        }
-                        return null;
-                    }}
-                >
-                    <Label>Name</Label>
-                    <Input name="name" placeholder="John Doe" />
-                    <FieldError />
-                </TextField>
                 <TextField
                     isRequired
                     name="email"
@@ -70,30 +58,36 @@ const SignUpPage = () => {
                     <Input name="email" placeholder="john@example.com" />
                     <FieldError />
                 </TextField>
-                <TextField
-                    isRequired
-                    minLength={8}
-                    name="password"
-                    type="password"
-                    validate={(value) => {
-                        if (value.length < 8) {
-                            return "Password must be at least 8 characters";
-                        }
-                        if (!/[A-Z]/.test(value)) {
-                            return "Password must contain at least one uppercase letter";
-                        }
-                        if (!/[0-9]/.test(value)) {
-                            return "Password must contain at least one number";
-                        }
-                        return null;
-                    }}
-                >
+
+                <TextField className="w-full" name="password" isRequired>
                     <Label>Password</Label>
-                    <Input name="password" placeholder="Enter your password" />
-                    <Description>
-                        Must be at least 8 characters with 1 uppercase and 1
-                        number
-                    </Description>
+                    <InputGroup>
+                        <InputGroup.Input
+                            className="w-full"
+                            type={isVisible ? "text" : "password"}
+                            name="password"
+                            placeholder="Enter your password"
+                        />
+                        <InputGroup.Suffix className="pr-0">
+                            <Button
+                                isIconOnly
+                                aria-label={
+                                    isVisible
+                                        ? "Hide password"
+                                        : "Show password"
+                                }
+                                size="sm"
+                                variant="ghost"
+                                onPress={() => setIsVisible(!isVisible)}
+                            >
+                                {isVisible ? (
+                                    <Eye className="size-4" />
+                                ) : (
+                                    <EyeSlash className="size-4" />
+                                )}
+                            </Button>
+                        </InputGroup.Suffix>
+                    </InputGroup>
                     <FieldError />
                 </TextField>
                 <div className="flex gap-2">
@@ -110,4 +104,4 @@ const SignUpPage = () => {
     );
 };
 
-export default SignUpPage;
+export default SignInPage;
