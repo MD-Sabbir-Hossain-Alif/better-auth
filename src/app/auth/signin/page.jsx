@@ -25,7 +25,7 @@ const SignInPage = () => {
             email: userData.email,
             password: userData.password,
             rememberMe: true,
-            callbackURL: "/",
+            callbackURL: "/dashboard",
         });
         console.log("sign up response:", { data, error });
     };
